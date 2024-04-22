@@ -1,0 +1,16 @@
+fibonacci(n)
+  if n < 0 then
+    Raise ("n not be negative")
+  else if n == 0 then
+    return 0
+  else if n == 1 then
+    return 1
+  else
+    return fibonacci(n-1) + fibonacci(n-2)
+
+recursive approach has exponential time complexity due to repeated function calls. For each n, the function calls itself twice (for n-1 and n-2).
+
+Iterative approach has a time complexity of O(n)
+
+			Recursive		Iterative
+Time Complexity	O(2^n) - Exponential	O(n) - Linear

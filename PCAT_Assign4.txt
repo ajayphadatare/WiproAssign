@@ -1,0 +1,24 @@
+bubbleSort(array)
+  for i in range(len(arr) - 1):
+    swapp = false
+    for j in range(len(arr) - i - 1):
+      if arr[j] > arr[j + 1]:
+          Swap elements
+        temp = arr[j]
+        arr[j] = arr[j + 1]
+        arr[j + 1] = temp
+        swapp = true
+    if not swapp:
+       array is sorted
+      break
+
+Explaination - 
+
+1 - An outer loop (i) iterates len(arr) - 1 time.
+2 - An inner loop (j) iterates len(arr) - i - 1 time.
+3 - Inside the inner loop, adjacent elements (arr[j] & arr[j + 1]) are compared.
+4 - If the elements are in the wrong order (arr[j] > arr[j + 1]), a temporary variable (temp) is used to swap their positions.
+5 - A flag (swapp) is set to true to indicate that a swap occurred in this pass.
+6 - The outer loop continues iterating. If no swaps occur in a complete pass (not swapp), it means the list is sorted, and the loop breaks.
+
+arr = [64, 34, 25, 12, 22, 11, 90]

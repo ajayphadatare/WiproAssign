@@ -1,0 +1,60 @@
+Modularity  - it means divide the program into smaller parts known as functions.which can be used ( reused ) in other program also.
+
+Nth Fibonacci
+
+PseudoCode - 
+
+fibonacci(n)
+  if n < 0 then
+    Raise ("n not be negative")
+  else if n == 0 then
+    return 0
+  else if n == 1 then
+    return 1
+  else
+    a, b = 0, 1
+    for i in range(2, n + 1):
+      c = a + b
+      a = b
+      b = c
+    return b
+
+Code - 
+
+static int fib(int n)
+{
+    int a = 0, b = 1, c, i;
+    if (n == 0)
+        return a;
+    for (i = 2; i <= n; i++) {
+        c = a + b;
+        a = b;
+        b = c;
+    }
+    return b;
+}
+
+
+
+Factorial
+
+PseudoCode - 
+
+factorial(n)
+  if n < 0 then
+    Raise ("n not be negative")
+  else if n == 0 then
+    return 1
+  else
+    result = 1
+    for i in range(1, n + 1):
+      result *= i
+    return result
+
+static int factorial(int n) 
+    { 
+        int res = 1, i; 
+        for (i = 2; i <= n; i++) 
+            res *= i; 
+        return res; 
+    } 
