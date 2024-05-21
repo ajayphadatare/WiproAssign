@@ -1,137 +1,102 @@
-import java.util.Iterator;
+[2:09 PM] Maria (Unverified)
+package com.graph;
  
-/*
-* Linked List
-*
-* Insert at Beginning
-* Display
-* Insert at any pos
-* Delete at any pos
-*
-* generics
-*/
-public class LinkedList<T>  {
-	Node head;
-	
-	class Node{
-		T data;
-		Node next;	
-		Node(T val){
-			data = val;
-			next = null;
-		}
+public class GraphRepresentation {
+ 
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+int[][] graph= {
+		{0,1,0,0,1},
+		{1,0,1,0,1},
+		{0,1,0,1,0},
+		{0,0,1,0,1},
+		{1,1,0,1,0}	
+};
+Graph g =new Graph(5);//No of vertices are 5
+g.addEdge(0,1);
+g.addEdge(2,3);
+g.addEdge(1,2);
+g.addEdge(3,4);
+g.addEdge(0,4);
+g.addEdge(1,4);
+g.printAdjList();
+ 
+//g.bfs(0);
+g.dfs(0);
 	}
-	LinkedList(){
-		head = null;
-	}
-	public void insertAtBeginning(T val){
-		Node newNode = new Node(val);
-		//when list empty
-		if(head==null)
-			head = newNode;
-		else { //list is not empty
-			newNode.next = head;	
-			head = newNode;
-		}	
-		
-	}
-	
-	public void display() {
-		Node temp = head; //start from head
-		while(temp != null) { //null implies end of list
-			System.out.print( temp.data );
-			temp = temp.next; //jump
-		}
-		
-	}
-	public void insertAtPos(int pos,T val) {
-		if(pos==0)
-		{
-			insertAtBeginning(val);
-			return;
-		}
-		
-		Node newNode = new Node(val);
-		Node temp = head;
-		for(int i=1;i<=pos-1;i++) { //jump to prev node
-			temp = temp.next;
-			if(temp==null)
-				throw new IndexOutOfBoundsException("Invalid Pos " + pos);
-		}
-		//reassign pointers
-				newNode.next = temp.next;
-				temp.next = newNode;
-		
+ 
 }
-	
-	
-public void deleteAtPos(int pos) {
-		
-		if(head==null)
-			throw new IndexOutOfBoundsException("Deletion attempted on empty list ");
-	
-		if(pos==0) {
-			head = head.next;
-			return;
+
+
+[2:09 PM] Maria (Unverified)
+package com.graph;
+ 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+ 
+public class Graph {
+	ArrayList<ArrayList<Integer>> adjList = new ArrayList<>();
+ 
+	Graph(int v) {
+		for (int i = 0; i < v; i++) {
+			adjList.add(new ArrayList<Integer>());
 		}
-		
-		Node temp = head;
-		Node prev = null;
-		
-		//jump till node to be deleted
-		for(int i=1;i<=pos;i++) {
-			prev = temp; //keep track of prev node
-			temp = temp.next; //jump to next node
+	}
+ 
+	public void addEdge(int U, int V) {
+		adjList.get(U).add(V);
+		adjList.get(V).add(U);
+	}
+ 
+	public void printAdjList() {
+		for (int i = 0; i < adjList.size(); i++) {// i-Vertex no
+			System.out.println("Adj list of vertex " + i);
+			for (int j = 0; j < adjList.get(i).size(); j++) {
+				System.out.println(" " + adjList.get(i).get(j));
+			}
 		}
-		
-		prev.next = temp.next; //reassign pointers
 	}
  
-public void deleteAtBeginning() {
-	
-	if(head==null)
-		throw new IndexOutOfBoundsException("Deletion attempted on empty list ");
+	// BFS
  
-	head = head.next;
+	public void bfs(int v) {
+		int V = adjList.size();// total no of vertices
+		boolean[] visited = new boolean[V];
+		visited[v] = true;
+ 
+		Queue<Integer> q = new LinkedList<>();
+		q.add(v);
+		while (q.size() != 0) {
+			// dequeue
+			int vertex = q.remove();
+			System.out.print(vertex + " ");
+			for (int i = 0; i < adjList.get(vertex).size(); i++) {
+				int av = adjList.get(vertex).get(i);
+				if (!visited[av]) {
+					q.add(av);
+					visited[av] = true;
+				}
+			}
+		}
+	}
+ 
+	public void dfs(int v) {
+		int V = adjList.size();// total no of vertices
+		boolean[] visited = new boolean[V];
+		dfs2(v, visited);
+ 
+	}
+ 
+	public void dfs2(int v, boolean[] visited) {
+		visited[v] = true;
+		System.out.println(v + " ");
+		for (int i = 0; i < adjList.get(v).size(); i++) {
+			int av = adjList.get(v).get(i);
+			if (!visited[av])
+				dfs2(av, visited);
+ 
+		}
+	}
 }
-/*public void reverse() {
-	Node prev = null;
-	Node current = head;
-	Node next = head.next;
-	
-	while(current!=null) {
-		next=current.next;
-		current.next = prev; //reverse link
-		prev = current;
-		current = next;
-	}
-	
-	head = prev;
-	}
-	*/
-}
-/*
-* public Iterator<T> iterator(){ return new Iterator<T>() { Node temp = head;
-*
-* public boolean hasNext() { return temp!=null; }
-*
-* public T next() { T val = temp.data; temp = temp.next; return val;
-*
-* } }; }
-*/
-	
-	
- 
- 
- 
-/*try the following methods
-*
-* get(pos) - get(2)
-* update(pos,val)
-* deleteAtEnd
-* insertAtEnd(val)
-* search(val) - return index, -1
-* contains(val) - return true or false
-* length
-*/
  
