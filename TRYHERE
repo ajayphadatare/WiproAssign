@@ -1,67 +1,103 @@
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
-public class BFSGraph {
-    private int V;   // Number of vertices
-    private LinkedList<Integer> adj[]; // Adjacency List
+public class Graph {
+    private int numVertices;
+    private List<Integer>[] adjacencyList;
 
-    // Constructor
-    BFSGraph(int v) {
-        V = v;
-        adj = new LinkedList[v];
-        for (int i = 0; i < v; ++i) {
-            adj[i] = new LinkedList();
+    public Graph(int numVertices) {
+        this.numVertices = numVertices;
+        this.adjacencyList = new List[numVertices];
+
+        for (int i = 0; i < numVertices; i++) {
+            adjacencyList[i] = new ArrayList<>();
         }
     }
 
-    // Function to add an edge into the graph
-    void addEdge(int v, int w) {
-        adj[v].add(w);  // Add w to v's list.
-        adj[w].add(v);  // Since the graph is undirected, add v to w's list as well.
+    public void addEdge(int source, int destination) {
+        adjacencyList[source].add(destination);
+        adjacencyList[destination].add(source);
     }
 
-    // Function to perform BFS traversal starting from a given node
-    void BFS(int startNode) {
-        // Mark all the vertices as not visited (set as false by default in Java)
-        boolean visited[] = new boolean[V];
+    public List<Integer> getNeighbors(int vertex) {
+        return adjacencyList[vertex];
+    }
 
-        // Create a queue for BFS
-        LinkedList<Integer> queue = new LinkedList<Integer>();
+    public int getNumVertices() {
+        return numVertices;
+    }
+}
 
-        // Mark the current node as visited and enqueue it
-        visited[startNode] = true;
-        queue.add(startNode);
+public class BreadthFirstSearch {
+    private boolean[] visited;
 
-        while (queue.size() != 0) {
-            // Dequeue a vertex from the queue and print it
-            startNode = queue.poll();
-            System.out.print(startNode + " ");
+    public void bfs(Graph graph, int start) {
+        visited = new boolean[graph.getNumVertices()];
+        Queue<Integer> queue = new LinkedList<>();
 
-            // Get all adjacent vertices of the dequeued vertex startNode
-            // If an adjacent has not been visited, mark it visited and enqueue it
-            Iterator<Integer> i = adj[startNode].listIterator();
-            while (i.hasNext()) {
-                int n = i.next();
-                if (!visited[n]) {
-                    visited[n] = true;
-                    queue.add(n);
+        queue.add(start);
+        visited[start] = true;
+
+        while (!queue.isEmpty()) {
+            int node = queue.poll();
+            System.out.print(node + " ");
+
+            for (int neighbor : graph.getNeighbors(node)) {
+                if (!visited[neighbor]) {
+                    queue.add(neighbor);
+                    visited[neighbor] = true;
                 }
             }
         }
     }
+}
 
-    // Driver method to test the above methods
-    public static void main(String args[]) {
-        BFSGraph g = new BFSGraph(4);
+public class DepthFirstSearch {
+    private boolean[] visited;
+    private List<Integer> dfsOrder;
 
-        g.addEdge(0, 1);
-        g.addEdge(0, 2);
-        g.addEdge(1, 2);
-        g.addEdge(2, 0);
-        g.addEdge(2, 3);
-        g.addEdge(3, 3);
+    public void dfs(Graph graph, int start) {
+        visited = new boolean[graph.getNumVertices()];
+        dfsOrder = new ArrayList<>();
 
-        System.out.println("Breadth First Traversal starting from node 2:");
+        dfsRecursive(graph, start);
 
-        g.BFS(2);
+        System.out.println("DFS Order:");
+        for (int node : dfsOrder) {
+            System.out.print(node + " ");
+        }
+    }
+
+    private void dfsRecursive(Graph graph, int vertex) {
+        visited[vertex] = true;
+        dfsOrder.add(vertex);
+
+        for (int neighbor : graph.getNeighbors(vertex)) {
+            if (!visited[neighbor]) {
+                dfsRecursive(graph, neighbor);
+            }
+        }
+    }
+}
+
+public class GraphTraversal {
+    public static void main(String[] args) {
+        Graph graph = new Graph(4);
+        graph.addEdge(0, 1);
+        graph.addEdge(0, 2);
+        graph.addEdge(1, 2);
+        graph.addEdge(2, 0);
+        graph.addEdge(2, 3);
+        graph.addEdge(3, 3);
+
+        BreadthFirstSearch bfs = new BreadthFirstSearch();
+        bfs.bfs(graph, 2);
+
+        System.out.println();
+
+        DepthFirstSearch dfs = new DepthFirstSearch();
+        dfs.dfs(graph, 2);
     }
 }
