@@ -1,103 +1,340 @@
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+Day13 -1 
 
-public class Graph {
-    private int numVertices;
-    private List<Integer>[] adjacencyList;
+public class BinaryTree {
+    private static class Node {
+        int value;
+        Node left;
+        Node right;
 
-    public Graph(int numVertices) {
-        this.numVertices = numVertices;
-        this.adjacencyList = new List[numVertices];
-
-        for (int i = 0; i < numVertices; i++) {
-            adjacencyList[i] = new ArrayList<>();
+        public Node(int value) {
+            this.value = value;
         }
     }
 
-    public void addEdge(int source, int destination) {
-        adjacencyList[source].add(destination);
-        adjacencyList[destination].add(source);
+    public static boolean isBalanced(Node root) {
+        if (root == null) {
+            return true;
+        }
+
+        int leftHeight = getHeight(root.left);
+        int rightHeight = getHeight(root.right);
+
+        if (Math.abs(leftHeight - rightHeight) > 1) {
+            return false;
+        }
+
+        return isBalanced(root.left) && isBalanced(root.right);
     }
 
-    public List<Integer> getNeighbors(int vertex) {
-        return adjacencyList[vertex];
+    private static int getHeight(Node node) {
+        if (node == null) {
+            return 0;
+        }
+
+        return 1 + Math.max(getHeight(node.left), getHeight(node.right));
     }
 
-    public int getNumVertices() {
-        return numVertices;
+    // Example usage
+    public static void main(String[] args) {
+        Node root = new Node(1);
+        root.left = new Node(2);
+        root.right = new Node(3);
+        root.left.left = new Node(4);
+        root.left.right = new Node(5);
+
+        boolean isBalanced = isBalanced(root);
+        System.out.println("Is the binary tree balanced? " + isBalanced);
     }
 }
 
-public class BreadthFirstSearch {
-    private boolean[] visited;
 
-    public void bfs(Graph graph, int start) {
-        visited = new boolean[graph.getNumVertices()];
-        Queue<Integer> queue = new LinkedList<>();
+Day13c -2 
 
-        queue.add(start);
-        visited[start] = true;
+public class TrieNode
+{
+    public Dictionary<char, TrieNode> Children { get; }
+    public bool IsEndOfWord { get; set; }
 
-        while (!queue.isEmpty()) {
-            int node = queue.poll();
-            System.out.print(node + " ");
+    public TrieNode()
+    {
+        Children = new Dictionary<char, TrieNode>();
+        IsEndOfWord = false;
+    }
+}
 
-            for (int neighbor : graph.getNeighbors(node)) {
-                if (!visited[neighbor]) {
-                    queue.add(neighbor);
-                    visited[neighbor] = true;
+public class Trie
+{
+    private TrieNode root;
+
+    public Trie()
+    {
+        root = new TrieNode();
+    }
+
+    public void Insert(string word)
+    {
+        TrieNode currentNode = root;
+
+        foreach (char c in word)
+        {
+            if (!currentNode.Children.ContainsKey(c))
+            {
+                currentNode.Children[c] = new TrieNode();
+            }
+
+            currentNode = currentNode.Children[c];
+        }
+
+        currentNode.IsEndOfWord = true;
+    }
+
+    public bool Search(string word)
+    {
+        TrieNode currentNode = root;
+
+        foreach (char c in word)
+        {
+            if (!currentNode.Children.ContainsKey(c))
+            {
+                return false;
+            }
+
+            currentNode = currentNode.Children[c];
+        }
+
+        return currentNode.IsEndOfWord;
+    }
+
+    public bool StartsWith(string prefix)
+    {
+        TrieNode currentNode = root;
+
+        foreach (char c in prefix)
+        {
+            if (!currentNode.Children.ContainsKey(c))
+            {
+                return false;
+            }
+
+            currentNode = currentNode.Children[c];
+        }
+
+        return true;
+    }
+}
+
+// Example usage
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        Trie trie = new Trie();
+        trie.Insert("apple");
+        trie.Insert("banana");
+        trie.Insert("orange");
+
+        bool isPrefixPresent = trie.StartsWith("ban");
+        Console.WriteLine("Is prefix present in trie? " + isPrefixPresent);
+    }
+}
+
+
+
+Day13 -3 
+public class MinHeap
+{
+    private List<int> heap;
+
+    public MinHeap()
+    {
+        heap = new List<int>();
+        heap.Add(int.MinValue); // Add a dummy element at index 0
+    }
+
+    public void Insert(int value)
+    {
+        heap.Add(value);
+        HeapifyUp(heap.Count - 1);
+    }
+
+    public int DeleteMin()
+    {
+        if (heap.Count <= 1)
+        {
+            throw new InvalidOperationException("Heap is empty");
+        }
+
+        int min = heap[1];
+        heap[1] = heap[heap.Count - 1];
+        heap.RemoveAt(heap.Count - 1);
+        HeapifyDown(1);
+        return min;
+    }
+
+    public int GetMin()
+    {
+        if (heap.Count <= 1)
+        {
+            throw new InvalidOperationException("Heap is empty");
+        }
+
+        return heap[1];
+    }
+
+    private void HeapifyUp(int index)
+    {
+        int parentIndex = index / 2;
+
+        while (index > 1 && heap[index] < heap[parentIndex])
+        {
+            Swap(index, parentIndex);
+            index = parentIndex;
+            parentIndex = index / 2;
+        }
+    }
+
+    private void HeapifyDown(int index)
+    {
+        while (index <= heap.Count / 2)
+        {
+            int smallerChildIndex = GetSmallerChildIndex(index);
+
+            if (smallerChildIndex == -1 || heap[index] <= heap[smallerChildIndex])
+            {
+                break;
+            }
+
+            Swap(index, smallerChildIndex);
+            index = smallerChildIndex;
+        }
+    }
+
+    private int GetSmallerChildIndex(int index)
+    {
+        int leftChildIndex = index * 2;
+        int rightChildIndex = index * 2 + 1;
+
+        if (rightChildIndex >= heap.Count)
+        {
+            return leftChildIndex;
+        }
+
+        return heap[leftChildIndex] < heap[rightChildIndex] ? leftChildIndex : rightChildIndex;
+    }
+
+    private void Swap(int index1, int index2)
+    {
+        int temp = heap[index1];
+        heap[index1] = heap[index2];
+        heap[index2] = temp;
+    }
+}
+
+// Example usage
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        MinHeap minHeap = new MinHeap();
+        minHeap.Insert(5);
+        minHeap.Insert(2);
+        minHeap.Insert(8);
+        minHeap.Insert(1);
+        minHeap.Insert(3);
+
+        int min = minHeap.GetMin();
+        Console.WriteLine("Minimum element in the heap: " + min);
+
+        int deletedMin = minHeap.DeleteMin();
+        Console.WriteLine("Deleted minimum element: " + deletedMin);
+    }
+}
+
+
+
+Day13 -4 
+
+public class Graph
+{
+    private Dictionary<int, List<int>> adjacencyList;
+    private bool[] visited;
+    private bool[] onStack;
+
+    public Graph()
+    {
+        adjacencyList = new Dictionary<int, List<int>>();
+        visited = new bool[adjacencyList.Count];
+        onStack = new bool[adjacencyList.Count];
+    }
+
+    public void AddEdge(int source, int destination)
+    {
+        if (!adjacencyList.ContainsKey(source))
+        {
+            adjacencyList[source] = new List<int>();
+        }
+
+        adjacencyList[source].Add(destination);
+    }
+
+    public bool AddEdgeAndCheckCycle(int source, int destination)
+    {
+        if (HasCycle(source, destination))
+        {
+            return false; // Edge cannot be added as it would create a cycle
+        }
+
+        AddEdge(source, destination);
+        return true; // Edge added successfully
+    }
+
+    private bool HasCycle(int source, int destination)
+    {
+        if (visited[source])
+        {
+            if (onStack[source])
+            {
+                return true; // Cycle detected
+            }
+        }
+        else
+        {
+            visited[source] = true;
+            onStack[source] = true;
+
+            if (adjacencyList.ContainsKey(source))
+            {
+                foreach (int neighbor in adjacencyList[source])
+                {
+                    if (HasCycle(neighbor, destination))
+                    {
+                        return true; // Cycle detected
+                    }
                 }
             }
+
+            onStack[source] = false;
         }
+
+        return false; // No cycle detected
     }
 }
 
-public class DepthFirstSearch {
-    private boolean[] visited;
-    private List<Integer> dfsOrder;
+// Example usage
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        Graph graph = new Graph();
+        graph.AddEdge(1, 2);
+        graph.AddEdge(2, 3);
+        graph.AddEdge(3, 1);
 
-    public void dfs(Graph graph, int start) {
-        visited = new boolean[graph.getNumVertices()];
-        dfsOrder = new ArrayList<>();
+        bool canAddEdge = graph.AddEdgeAndCheckCycle(2, 4);
+        Console.WriteLine("Can add edge 2 -> 4? " + canAddEdge);
 
-        dfsRecursive(graph, start);
-
-        System.out.println("DFS Order:");
-        for (int node : dfsOrder) {
-            System.out.print(node + " ");
-        }
-    }
-
-    private void dfsRecursive(Graph graph, int vertex) {
-        visited[vertex] = true;
-        dfsOrder.add(vertex);
-
-        for (int neighbor : graph.getNeighbors(vertex)) {
-            if (!visited[neighbor]) {
-                dfsRecursive(graph, neighbor);
-            }
-        }
+        canAddEdge = graph.AddEdgeAndCheckCycle(3, 4);
+        Console.WriteLine("Can add edge 3 -> 4? " + canAddEdge);
     }
 }
 
-public class GraphTraversal {
-    public static void main(String[] args) {
-        Graph graph = new Graph(4);
-        graph.addEdge(0, 1);
-        graph.addEdge(0, 2);
-        graph.addEdge(1, 2);
-        graph.addEdge(2, 0);
-        graph.addEdge(2, 3);
-        graph.addEdge(3, 3);
-
-        BreadthFirstSearch bfs = new BreadthFirstSearch();
-        bfs.bfs(graph, 2);
-
-        System.out.println();
-
-        DepthFirstSearch dfs = new DepthFirstSearch();
-        dfs.dfs(graph, 2);
-    }
-}
