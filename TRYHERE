@@ -1,256 +1,70 @@
-Task 2: Kruskal’s Algorithm for MST
-Implement Kruskal’s algorithm to find the minimum spanning tree of a given connected, undirected graph with non-negative edge weights
-
-package com.Day16;
-
-import java.util.*;
-
-class Edge implements Comparable<Edge> {
-    int src, dest, weight;
-
-    // Comparator function used for sorting edges based on their weight
-    public int compareTo(Edge compareEdge) {
-        return this.weight - compareEdge.weight;
-    }
-};
-
-class Subset {
-    int parent, rank;
-};
-
-public class Task1_KruskalAlgorithm {
-    int V, E; // V -> Number of vertices, E -> Number of edges
-    Edge edge[]; // Collection of all edges
-
-    // Constructor
-    Task1_KruskalAlgorithm(int v, int e) {
-        V = v;
-        E = e;
-        edge = new Edge[E];
-        for (int i = 0; i < e; ++i)
-            edge[i] = new Edge();
-    }
-
-    // A utility function to find set of an element i
-    // (uses path compression technique)
-    int find(Subset subsets[], int i) {
-        if (subsets[i].parent != i)
-            subsets[i].parent = find(subsets, subsets[i].parent);
-        return subsets[i].parent;
-    }
-
-    // A function that does union of two sets of x and y
-    // (uses union by rank)
-    void union(Subset subsets[], int x, int y) {
-        int xroot = find(subsets, x);
-        int yroot = find(subsets, y);
-
-        // Attach smaller rank tree under root of high rank tree
-        // (Union by Rank)
-        if (subsets[xroot].rank < subsets[yroot].rank)
-            subsets[xroot].parent = yroot;
-        else if (subsets[xroot].rank > subsets[yroot].rank)
-            subsets[yroot].parent = xroot;
-
-        // If ranks are same, then make one as root and
-        // increment its rank by one
-        else {
-            subsets[yroot].parent = xroot;
-            subsets[xroot].rank++;
-        }
-    }
-
-    // The main function to construct MST using Kruskal's algorithm
-    void KruskalMST() {
-        // This will store the resultant MST
-        Edge result[] = new Edge[V];
-        int e = 0; // An index variable, used for result[]
-        int i = 0; // An index variable, used for sorted edges
-        for (i = 0; i < V; ++i)
-            result[i] = new Edge();
-
-        // Step 1: Sort all the edges in non-decreasing order of their weight
-        Arrays.sort(edge);
-
-        // Allocate memory for creating V subsets
-        Subset subsets[] = new Subset[V];
-        for (i = 0; i < V; ++i)
-            subsets[i] = new Subset();
-
-        // Create V subsets with single elements
-        for (int v = 0; v < V; ++v) {
-            subsets[v].parent = v;
-            subsets[v].rank = 0;
-        }
-
-        i = 0; // Index used to pick next edge
-
-        // Number of edges to be taken is equal to V-1
-        while (e < V - 1) {
-            // Step 2: Pick the smallest edge. Check if it forms a cycle
-            // with the spanning tree formed so far. If a cycle is not
-            // formed, include this edge. Else, discard it.
-
-            // Pick the smallest edge and increment the index
-            // for next iteration
-            Edge next_edge = edge[i++];
-
-            int x = find(subsets, next_edge.src);
-            int y = find(subsets, next_edge.dest);
-
-            // If including this edge does not cause cycle,
-            // include it in result and increment the index
-            // of result for next edge
-            if (x != y) {
-                result[e++] = next_edge;
-                union(subsets, x, y);
+[10:23 AM] Maria (Unverified)
+package com.patternsearching;
+ 
+public class KMPAlgorithm {
+	void KMPSearch(String pat, String txt) {
+        int M = pat.length();
+        int N = txt.length();
+        
+        // create lps[] that will hold the longest prefix suffix values for pattern
+        int lps[] = new int[M];
+        int j = 0; // index for pat[]
+        
+        // Preprocess the pattern (calculate lps[] array)
+        computeLPSArray(pat, M, lps);
+        
+        int i = 0; // index for txt[]
+        while (i < N) {
+            if (pat.charAt(j) == txt.charAt(i)) {
+                j++;
+                i++;
             }
-            // Else discard the next_edge
+            if (j == M) {
+                System.out.println("Found pattern at index " + (i - j));
+                j = lps[j - 1];
+            }
+            // mismatch after j matches
+            else if (i < N && pat.charAt(j) != txt.charAt(i)) {
+                // Do not match lps[0..lps[j-1]] characters, they will match anyway
+                if (j != 0)
+                    j = lps[j - 1];
+                else
+                    i = i + 1;
+            }
         }
-
-        // Print the contents of result[] to display the built MST
-        System.out.println("Following are the edges in the constructed MST");
-        for (i = 0; i < e; ++i)
-            System.out.println(result[i].src + " -- " + result[i].dest + " == " + result[i].weight);
     }
-
-    // Driver Program
+    
+    void computeLPSArray(String pat, int M, int lps[]) {
+        // length of the previous longest prefix suffix
+        int len = 0;
+        int i = 1;
+        lps[0] = 0; // lps[0] is always 0
+        
+        // the loop calculates lps[i] for i = 1 to M-1
+        while (i < M) {
+            if (pat.charAt(i) == pat.charAt(len)) {
+                len++;
+                lps[i] = len;
+                i++;
+            } else {
+                // (pat[i] != pat[len])
+                if (len != 0) {
+                    len = lps[len - 1];
+                } else {
+                    lps[i] = len;
+                    i++;
+                }
+            }
+        }
+    }
+    
     public static void main(String[] args) {
-        /* Let us create the following graph
-                10
-            0--------1
-            |  \     |
-           6|   5\   |15
-            |      \ |
-            2--------3
-                4       */
-        int V = 4; // Number of vertices in graph
-        int E = 5; // Number of edges in graph
-        Task1_KruskalAlgorithm graph = new Task1_KruskalAlgorithm(V, E);
-
-        // add edge 0-1
-        graph.edge[0].src = 0;
-        graph.edge[0].dest = 1;
-        graph.edge[0].weight = 10;
-
-        // add edge 0-2
-        graph.edge[1].src = 0;
-        graph.edge[1].dest = 2;
-        graph.edge[1].weight = 6;
-
-        // add edge 0-3
-        graph.edge[2].src = 0;
-        graph.edge[2].dest = 3;
-        graph.edge[2].weight = 5;
-
-        // add edge 1-3
-        graph.edge[3].src = 1;
-        graph.edge[3].dest = 3;
-        graph.edge[3].weight = 15;
-
-        // add edge 2-3
-        graph.edge[4].src = 2;
-        graph.edge[4].dest = 3;
-        graph.edge[4].weight = 4;
-
-        graph.KruskalMST();
+        KMPAlgorithm kmp = new KMPAlgorithm();
+        String txt = "ABABDABACDABABCABAB";
+        String pat = "ABABCABAB";
+        kmp.KMPSearch(pat, txt);
     }
 }
 
-
-
-[11:13 AM] Maria (Unverified)
-Task 1: String Operations
-
-Write a method that takes two strings, concatenates them, reverses the
-
-result, and then extracts the middle substring of the given length. 
-
-Ensure your method handles edge cases, such as an empty string or a 
-
-substring length larger than the concatenated string.
-
-package com.Day16;
-
-public class task2_stringOperation {
-	
-	    public static String extractMiddleSubstring(String str1, String str2, int length) {
-	        if (str1 == null || str2 == null || length <= 0) {
-	            return "";
-	        }
-
-	        String concatenated = str1 + str2;
-	        if (concatenated.isEmpty()) {
-	            return "";
-	        }
-
-	        StringBuilder reversed = new StringBuilder(concatenated).reverse();
-	        int startIndex = (reversed.length() - length) / 2;
-	        int endIndex = startIndex + length - 1;
-
-	        if (startIndex < 0 || endIndex >= reversed.length()) {
-	            return "";
-	        }
-
-	        return reversed.substring(startIndex, endIndex + 1);
-	    }
-
-	    public static void main(String[] args) {
-	        String str1 = "Hello";
-	        String str2 = "World";
-	        int length = 5;
-
-	        String middleSubstring = extractMiddleSubstring(str1, str2, length);
-	        System.out.println("Middle Substring: " + middleSubstring);
-	    }
-
-}
-
-
-Task 2: Naive Pattern Search
-Implement the naive pattern searching algorithm to find all occurrences
-of a pattern within a given text string. Count the number of comparisons
-made during the search to evaluate the efficiency of the algorithm.
-
-package com.Day16;
-
-public class task3_NaivePattern {
-	    public static int[] searchPattern(String text, String pattern) {
-	        int[] occurrences = new int[text.length() - pattern.length() + 1];
-	        int occurrencesCount = 0;
-	        int comparisons = 0;
-
-	        for (int i = 0; i <= text.length() - pattern.length(); i++) {
-	            boolean match = true;
-	            for (int j = 0; j < pattern.length(); j++) {
-	                comparisons++;
-	                if (text.charAt(i + j) != pattern.charAt(j)) {
-	                    match = false;
-	                    break;
-	                }
-	            }
-	            if (match) {
-	                occurrences[occurrencesCount++] = i;
-	            }
-	        }
-
-	        int[] result = new int[occurrencesCount];
-	        System.arraycopy(occurrences, 0, result, 0, occurrencesCount);
-
-	        System.out.println("Number of Comparisons: " + comparisons);
-	        return result;
-	    }
-
-	    public static void main(String[] args) {
-	        String text = "The quick brown fox jumps over the lazy dog";
-	        String pattern = "fox";
-
-	        int[] occurrences = searchPattern(text, pattern);
-	        System.out.println("Occurrences of Pattern '" + pattern + "':");
-	        for (int occurrence : occurrences) {
-	            System.out.println(occurrence);
-	        }
-	    }
-}
 
 
