@@ -1,70 +1,144 @@
-[10:23 AM] Maria (Unverified)
-package com.patternsearching;
- 
+Task 3: Implementing the KMP Algorithm
+
+Code the Knuth-Morris-Pratt (KMP) algorithm in Java for pattern searching which pre-processes the pattern to reduce the number of comparisons.
+Explain how this pre-processing improves the search time compared to the naive approach.
+
 public class KMPAlgorithm {
-	void KMPSearch(String pat, String txt) {
-        int M = pat.length();
-        int N = txt.length();
-        
-        // create lps[] that will hold the longest prefix suffix values for pattern
-        int lps[] = new int[M];
-        int j = 0; // index for pat[]
-        
-        // Preprocess the pattern (calculate lps[] array)
-        computeLPSArray(pat, M, lps);
-        
-        int i = 0; // index for txt[]
-        while (i < N) {
-            if (pat.charAt(j) == txt.charAt(i)) {
-                j++;
+
+    // Method to create LPS (Longest Prefix Suffix) array
+    private static int[] computeLPSArray(String pattern) {
+        int length = 0;  // length of the previous longest prefix suffix
+        int i = 1;
+        int M = pattern.length();
+        int[] lps = new int[M];
+        lps[0] = 0;  // lps[0] is always 0
+
+        // Loop to calculate lps[i] for i = 1 to M-1
+        while (i < M) {
+            if (pattern.charAt(i) == pattern.charAt(length)) {
+                length++;
+                lps[i] = length;
                 i++;
+            } else { // (pattern[i] != pattern[length])
+                if (length != 0) {
+                    length = lps[length - 1];
+                } else { // if (length == 0)
+                    lps[i] = length;
+                    i++;
+                }
             }
+        }
+        return lps;
+    }
+
+    // KMP search algorithm
+    public static void KMPSearch(String pattern, String text) {
+        int M = pattern.length();
+        int N = text.length();
+
+        // Create lps[] array for the given pattern
+        int[] lps = computeLPSArray(pattern);
+
+        int i = 0; // index for text
+        int j = 0; // index for pattern
+
+        while (i < N) {
+            if (pattern.charAt(j) == text.charAt(i)) {
+                i++;
+                j++;
+            }
+
             if (j == M) {
                 System.out.println("Found pattern at index " + (i - j));
                 j = lps[j - 1];
-            }
-            // mismatch after j matches
-            else if (i < N && pat.charAt(j) != txt.charAt(i)) {
-                // Do not match lps[0..lps[j-1]] characters, they will match anyway
-                if (j != 0)
+            } else if (i < N && pattern.charAt(j) != text.charAt(i)) { // mismatch after j matches
+                if (j != 0) {
                     j = lps[j - 1];
-                else
-                    i = i + 1;
-            }
-        }
-    }
-    
-    void computeLPSArray(String pat, int M, int lps[]) {
-        // length of the previous longest prefix suffix
-        int len = 0;
-        int i = 1;
-        lps[0] = 0; // lps[0] is always 0
-        
-        // the loop calculates lps[i] for i = 1 to M-1
-        while (i < M) {
-            if (pat.charAt(i) == pat.charAt(len)) {
-                len++;
-                lps[i] = len;
-                i++;
-            } else {
-                // (pat[i] != pat[len])
-                if (len != 0) {
-                    len = lps[len - 1];
                 } else {
-                    lps[i] = len;
                     i++;
                 }
             }
         }
     }
-    
+
     public static void main(String[] args) {
-        KMPAlgorithm kmp = new KMPAlgorithm();
-        String txt = "ABABDABACDABABCABAB";
-        String pat = "ABABCABAB";
-        kmp.KMPSearch(pat, txt);
+        String text = "ABABDABACDABABCABAB";
+        String pattern = "ABABCABAB";
+        KMPSearch(pattern, text);
     }
 }
 
 
 
+Task 4: Rabin-Karp Substring Search
+
+Implement the Rabin-Karp algorithm for substring search using a rolling hash. 
+Discuss the impact of hash collisions on the algorithm's performance and how to handle them.
+
+
+public class RabinKarpAlgorithm {
+
+    // Prime number for hash calculation to reduce collisions
+    private static final int PRIME = 101;
+
+    // Rabin-Karp search algorithm
+    public static void search(String pattern, String text) {
+        int M = pattern.length();
+        int N = text.length();
+        long patternHash = createHash(pattern, M);
+        long textHash = createHash(text, M);
+
+        for (int i = 0; i <= N - M; i++) {
+            if (patternHash == textHash && checkEqual(text, i, i + M - 1, pattern, 0, M - 1)) {
+                System.out.println("Pattern found at index " + i);
+            }
+            if (i < N - M) {
+                textHash = recalculateHash(text, i, i + M, textHash, M);
+            }
+        }
+    }
+
+    // Function to create initial hash value for a string
+    private static long createHash(String str, int end) {
+        long hash = 0;
+        for (int i = 0; i < end; i++) {
+            hash += str.charAt(i) * Math.pow(PRIME, i);
+        }
+        return hash;
+    }
+
+    // Function to recalculate hash using rolling hash
+    private static long recalculateHash(String str, int oldIndex, int newIndex, long oldHash, int patternLen) {
+        long newHash = oldHash - str.charAt(oldIndex);
+        newHash /= PRIME;
+        newHash += str.charAt(newIndex) * Math.pow(PRIME, patternLen - 1);
+        return newHash;
+    }
+
+    // Function to check if the substring matches the pattern
+    private static boolean checkEqual(String str1, int start1, int end1, String str2, int start2, int end2) {
+        if (end1 - start1 != end2 - start2) {
+            return false;
+        }
+        while (start1 <= end1 && start2 <= end2) {
+            if (str1.charAt(start1) != str2.charAt(start2)) {
+                return false;
+            }
+            start1++;
+            start2++;
+        }
+        return true;
+    }
+
+    public static void main(String[] args) {
+        String text = "GEEKS FOR GEEKS";
+        String pattern = "GEEK";
+        search(pattern, text);
+    }
+}
+
+The Rabin-Karp algorithm is a string searching algorithm that can be used to find all occurrences of a pattern in a given text. It uses a rolling hash to quickly compute hash values for substrings of the text and compare them with the hash of the pattern.
+
+The Rabin-Karp algorithm works by first computing the hash value of the pattern and then computing the hash value of each substring of the text. If the hash values match, we need to compare the actual substrings to see if they are equal. If the hash values do not match, we can skip ahead by the size of the pattern to avoid unnecessary comparisons.
+
+However, hash collisions can occur when different strings compute the same hash value. This can happen even with a good hash function, so we need to handle this case. One way to handle hash collisions is to keep a linked list of all substrings that compute the same hash value, and then compare each substring to see if it matches the pattern.
