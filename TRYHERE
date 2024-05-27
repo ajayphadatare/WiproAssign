@@ -1,178 +1,73 @@
-[10:34 AM] Maria (Unverified)
-package com.bitwisealogorithms;
-/*
-* Using Built-in Functions
-* Some languages provide built-in functions to count set bits.
- 
-In Java 1.5 and later, you can use  Integer.bitCount() method
-*/
-public class CountSetBits {
-	public static void main(String[] args) {
-        int num = 29;
-        System.out.println("Number of set bits in " + num + " is " + Integer.bitCount(num));
-    }
-}
+Task 1: Bit Manipulation Basics
+Create a function that counts the number of set bits (1s) in the binary representation of an integer.
+Extend this to count the total number of set bits in all integers from 1 to n.
 
+public class BitManipulation {
 
-[11:23 AM] Maria (Unverified)
-package com.bitwisealogorithms;
-/*
-* Iterative Method
-* This is a straightforward method where you repeatedly shift the bits
-* of the number and check if the least significant bit is set.
-*/
-public class CountSetBitsEx2 {
-	// Function to count the number of set bits in a number
-    public static int countSetBits(int n) {
+    // Function to count the number of set bits in a single integer
+    public static int countSetBits(int x) {
         int count = 0;
-        while (n > 0) {
-            count += (n & 1); // step1: We have to find a bitwise_and with 1
-            n >>= 1; // step2:  We have to right shift with 1
+        while (x > 0) {
+            count += x & 1; // Add the least significant bit
+            x >>= 1;        // Shift right by 1 bit
         }
         return count;
     }
-//
-    public static void main(String[] args) {
-        int num = 53;
-        System.out.println("Number of set bits in " + num + " is " + countSetBits(num));
-    }
-}
 
-
-
-[12:09 PM] Maria (Unverified)
-package com.bitwisealogorithms;
- 
-public class FindNonRepeatingElements {
-	public static void findNonRepeating(int[] arr) {
-        int xorResult = 0;
- 
-        // Step 1: XOR all elements to get xorResult
-        for (int num : arr) {
-            xorResult ^= num;
-        }
- 
-        // Step 2: Find the rightmost set bit in xorResult
-        int setBit = xorResult & -xorResult;
- 
-        // Step 3: Divide elements into two sets and XOR them
-        int x = 0, y = 0;
-        for (int num : arr) {
-            if ((num & setBit) == 0) {
-                x ^= num;
-            } else {
-                y ^= num;
-            }
-        }
- 
-        // The two non-repeating elements are x and y
-        System.out.println("The two non-repeating elements are " + x + " and " + y);
-    }
- 
-    public static void main(String[] args) {
-        int[] arr = {4, 2, 4, 5, 2, 3, 3, 1};
-        findNonRepeating(arr);
-    }
-}
-
-
-
-[12:14 PM] Maria (Unverified)
-package com.bitwisealogorithms;
- 
-public class SwapBits {
-	 public static int swapBits(int n, int i, int j) {
-	        // Extract the i-th and j-th bits
-	        int bitAtI = (n >> i) & 1;
-	        int bitAtJ = (n >> j) & 1;
- 
-	        // If the bits are the same, no need to swap
-	        if (bitAtI == bitAtJ) {
-	            return n;
-	        }
- 
-	        // Create a bit mask where bits at positions i and j are set
-	        int mask = (1 << i) | (1 << j);
- 
-	        // Toggle the bits at positions i and j
-	        n = n ^ mask;
- 
-	        return n;
-	    }
- 
-	    public static void main(String[] args) {
-	        int num = 29; // binary: 11101
-	        int i = 1;
-	        int j = 3;
-	        System.out.println("Original number: " + num + " (" + Integer.toBinaryString(num) + ")");
-	        int result = swapBits(num, i, j);
-	        System.out.println("Number after swapping bits at positions " + i + " and " + j + ": " + result + " (" + Integer.toBinaryString(result) + ")");
-	    }
-}
-
-
-
-[12:20 PM] Maria (Unverified)
-package com.bitwisealogorithms;
- 
-public class CountTotalSetBits {
-	// Function to count total set bits in all numbers from 1 to n
+    // Function to count the total number of set bits from 1 to n
     public static int countTotalSetBits(int n) {
-        int totalSetBits = 0;
-        int i = 0;
-        
-        while ((1 << i) <= n) {
-            // Find the size of blocks and count how many full blocks of size 2^(i+1) are there
-            int blockSize = 1 << (i + 1);
-            int fullBlocks = n / blockSize;
-            
-            // Each full block contributes with 2^i set bits in i-th position
-            totalSetBits += fullBlocks * (1 << i);
-            
-            // Check if there are remaining bits after the last full block
-            int remainingBits = n % blockSize;
-            
-            // Add set bits in the remaining part, if any
-            totalSetBits += Math.max(0, remainingBits - (1 << i) + 1);
-            
-            i++;
+        int total = 0;
+        for (int i = 1; i <= n; i++) {
+            total += countSetBits(i);
         }
-        
-        return totalSetBits;
+        return total;
     }
- 
+
+    // Main method to test the functions
     public static void main(String[] args) {
-        int n = 7; // Example input
-        System.out.println("Total set bits from 1 to " + n + " is " + countTotalSetBits(n));
+        int n = 5; // Example input
+        System.out.println("Total number of set bits from 1 to " + n + ": " + countTotalSetBits(n));
     }
 }
 
 
-[1:03 PM] Maria (Unverified)
-package com.bitwisealogorithms;
- 
-public class OptimizeBitwiseAND {
-	// Function to calculate the Bitwise AND of all subsets of an array
-    public static int bitwiseANDOfAllSubsets(int[] arr) {
-        int result = arr[0];  // Initialize result with the first element
- 
-        // Iterate through each element and compute the AND with the result
-        for (int i = 1; i < arr.length; i++) {
-            result &= arr[i];
- 
-            // If result becomes zero, we can break early
-            if (result == 0) {
-                break;
+Task 2: Unique Elements Identification
+Given an array of integers where every element appears twice except for two,
+write a function that efficiently finds these two non-repeating elements using bitwise XOR operations.
+
+public class UniqueElements {
+
+    // Function to find the two unique elements in the array
+    public static int[] findUniqueElements(int[] nums) {
+        // Step 1: XOR all the elements
+        int xor = 0;
+        for (int num : nums) {
+            xor ^= num;
+        }
+
+        // Step 2: Find a set bit in the XOR result
+        // This bit is different between the two unique elements
+        int setBit = xor & -xor; // This isolates the rightmost set bit
+
+        // Step 3: Divide elements into two groups and XOR each group
+        int[] result = new int[2];
+        for (int num : nums) {
+            if ((num & setBit) == 0) {
+                result[0] ^= num; // Group 1
+            } else {
+                result[1] ^= num; // Group 2
             }
         }
- 
+
         return result;
     }
- 
+
+    // Main method to test the function
     public static void main(String[] args) {
-        int[] arr = {12, 15, 7};  // Example input
-        int andResult = bitwiseANDOfAllSubsets(arr);
-        System.out.println("Bitwise AND of all subsets: " + andResult);
+        int[] nums = {1, 2, 3, 2, 1, 4};
+        int[] uniqueElements = findUniqueElements(nums);
+        System.out.println("The two unique elements are: " + uniqueElements[0] + " and " + uniqueElements[1]);
     }
 }
- 
+
+
