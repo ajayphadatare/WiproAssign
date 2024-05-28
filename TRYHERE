@@ -1,121 +1,160 @@
-[4:04 PM] Maria (Unverified)
+[5:19 PM] Maria (Unverified)
 package com.computationalalgorithms;
  
-public class TravelingSalesman {
-	 // Function to solve the TSP using Dynamic Programming
-    public static int tsp(int[][] dist) {
-        int n = dist.length;
-        int VISITED_ALL = (1 << n) - 1;
-        int[][] dp = new int[1 << n][n];
+import java.util.Arrays;
  
-        // Initialize dp array with a large value
-        for (int i = 0; i < (1 << n); i++) {
-            for (int j = 0; j < n; j++) {
-                dp[i][j] = Integer.MAX_VALUE;
-            }
+class Job {
+    char id;     // Job Id
+    int deadline; // Deadline of job
+    int profit;  // Profit if job is completed before or on deadline
+    
+    // Constructor
+    public Job(char id, int deadline, int profit) {
+        this.id = id;
+        this.deadline = deadline;
+        this.profit = profit;
+    }
+}
+ 
+public class JobSequencing {
+ 
+    // Function to schedule the jobs to maximize profit
+    public static void scheduleJobs(Job[] jobs, int n) {
+        // Sort jobs in descending order of profit
+        Arrays.sort(jobs, (a, b) -> b.profit - a.profit);
+        
+        // To keep track of free time slots
+        boolean[] result = new boolean[n];
+        
+        // To store the sequence of jobs
+        char[] jobOrder = new char[n];
+        
+        // Initialize all slots to be free
+        for (int i = 0; i < n; i++) {
+            result[i] = false;
         }
- 
-        // Base case: starting from the first city
-        dp[1][0] = 0;
- 
-        // Iterate over all subsets of cities
-        for (int mask = 1; mask < (1 << n); mask++) {
-            for (int i = 0; i < n; i++) {
-                // Continue if the ith city is not in the subset represented by mask
-                if ((mask & (1 << i)) == 0) continue;
- 
-                // Try to find the minimum cost path to city i
-                for (int j = 0; j < n; j++) {
-                    if ((mask & (1 << j)) != 0 && i != j) {
-                        dp[mask][i] = Math.min(dp[mask][i], dp[mask ^ (1 << i)][j] + dist[j][i]);
-                    }
+        
+        // Iterate through all given jobs
+        for (int i = 0; i < jobs.length; i++) {
+            // Find a free slot for this job (starting from the last possible slot)
+            for (int j = Math.min(n, jobs[i].deadline) - 1; j >= 0; j--) {
+                // Free slot found
+                if (result[j] == false) {
+                    result[j] = true;
+                    jobOrder[j] = jobs[i].id;
+                    break;
                 }
             }
         }
- 
-        // Find the minimum cost to visit all cities and return to the starting city
-        int minCost = Integer.MAX_VALUE;
-        for (int i = 1; i < n; i++) {
-            minCost = Math.min(minCost, dp[VISITED_ALL][i] + dist[i][0]);
+        
+        // Print the job order to maximize profit
+        System.out.println("Job sequence to maximize profit:");
+        for (int i = 0; i < n; i++) {
+            if (result[i]) {
+                System.out.print(jobOrder[i] + " ");
+            }
         }
- 
-        return minCost;
+        System.out.println();
     }
  
+    // Driver code
     public static void main(String[] args) {
-        int[][] dist = {
-            {0, 10, 15, 20},
-            {10, 0, 35, 25},
-            {15, 35, 0, 30},
-            {20, 25, 30, 0}
+        Job[] jobs = {
+            new Job('a', 2, 100),
+            new Job('b', 1, 19),
+            new Job('c', 2, 27),
+            new Job('d', 1, 25),
+            new Job('e', 3, 15)
         };
- 
-        System.out.println("The minimum cost is " + tsp(dist));
+        int n = 3;  // Number of time slots
+        scheduleJobs(jobs, n);
     }
 }
 
 
+[5:18 PM] Maria (Unverified)
+Task 3: Job Sequencing Problem
 
-[4:05 PM] Maria (Unverified)
-Task 2: Traveling Salesman Problem
+Define a class Job with properties int Id, int Deadline, and int Profit.
 
-Create a function int FindMinCost(int[,] graph)
+Then implement a function List<Job> JobSequencing(List<Job> jobs) that
 
-that takes a 2D array representing the graph where graph[i][j] is
+takes a list of jobs and returns the maximum profit sequence of jobs 
 
-the cost to travel from city i to city j. The function should return
+that can be done before the deadlines. Use the greedy method to solve
 
-the minimum cost to visit all cities and return to the starting city. 
-
-Use dynamic programming for this solution.
+this problem.
 
 
-public class TravelingSalesman {
-    
-    public int FindMinCost(int[][] graph) {
-        int n = graph.length;
-        int VISITED_ALL = (1 << n) - 1;
-        int[][] dp = new int[n][1 << n];
-        
-        // Initialize dp array with -1
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < (1 << n); j++) {
-                dp[i][j] = -1;
-            }
-        }
-        
-        return tsp(0, 1, graph, dp, VISITED_ALL);
+import java.util.*;
+
+class Job {
+    int id;
+    int deadline;
+    int profit;
+
+    public Job(int id, int deadline, int profit) {
+        this.id = id;
+        this.deadline = deadline;
+        this.profit = profit;
     }
+}
 
-    private int tsp(int pos, int mask, int[][] graph, int[][] dp, int VISITED_ALL) {
-        if (mask == VISITED_ALL) {
-            return graph[pos][0];
-        }
+class JobSequencingSolution {
+    public List<Job> JobSequencing(List<Job> jobs) {
+        // Sort jobs based on profit in descending order
+        Collections.sort(jobs, (a, b) -> b.profit - a.profit);
 
-        if (dp[pos][mask] != -1) {
-            return dp[pos][mask];
-        }
-
-        int minCost = Integer.MAX_VALUE;
-        for (int city = 0; city < graph.length; city++) {
-            if ((mask & (1 << city)) == 0) {
-                int newCost = graph[pos][city] + tsp(city, mask | (1 << city), graph, dp, VISITED_ALL);
-                minCost = Math.min(minCost, newCost);
+        // Find the maximum deadline among all jobs
+        int maxDeadline = 0;
+        for (Job job : jobs) {
+            if (job.deadline > maxDeadline) {
+                maxDeadline = job.deadline;
             }
         }
 
-        dp[pos][mask] = minCost;
-        return minCost;
+        // Create a result array to store the result (sequence of jobs)
+        Job[] result = new Job[maxDeadline];
+        // Create a slot array to keep track of free time slots
+        boolean[] slot = new boolean[maxDeadline];
+
+        // Iterate through all given jobs
+        for (Job job : jobs) {
+            // Find a free slot for this job (we start from the last possible slot)
+            for (int j = job.deadline - 1; j >= 0; j--) {
+                if (!slot[j]) {
+                    // Add this job to result
+                    result[j] = job;
+                    slot[j] = true;
+                    break;
+                }
+            }
+        }
+
+        // Create a list to store the final job sequence
+        List<Job> jobSequence = new ArrayList<>();
+        for (Job job : result) {
+            if (job != null) {
+                jobSequence.add(job);
+            }
+        }
+
+        return jobSequence;
     }
 
     public static void main(String[] args) {
-        TravelingSalesman tsp = new TravelingSalesman();
-        int[][] graph = {
-            {0, 10, 15, 20},
-            {10, 0, 35, 25},
-            {15, 35, 0, 30},
-            {20, 25, 30, 0}
-        };
-        System.out.println("The minimum cost to visit all cities is: " + tsp.FindMinCost(graph));
+        List<Job> jobs = new ArrayList<>();
+        jobs.add(new Job(1, 4, 20));
+        jobs.add(new Job(2, 1, 10));
+        jobs.add(new Job(3, 1, 40));
+        jobs.add(new Job(4, 1, 30));
+
+        JobSequencingSolution solution = new JobSequencingSolution();
+        List<Job> jobSequence = solution.JobSequencing(jobs);
+
+        System.out.println("The job sequence for maximum profit is:");
+        for (Job job : jobSequence) {
+            System.out.println("Job ID: " + job.id + ", Deadline: " + job.deadline + ", Profit: " + job.profit);
+        }
     }
 }
