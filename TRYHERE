@@ -1,27 +1,30 @@
-[11:22 AM] Maria (Unverified)
-package com.computationalalgorithms;
- 
 public class TowerOfHanoi {
-	// Recursive function to solve the Tower of Hanoi puzzle
-    public static void solveHanoi(int n, char fromRod, char toRod, char auxRod) {
-        if (n == 1) {
-            System.out.println("Move disk 1 from rod " + fromRod + " to rod " + toRod);
-            return;
-        }
- 
-        // Move top n-1 disks from fromRod to auxRod using toRod
-        solveHanoi(n - 1, fromRod, auxRod, toRod);
- 
-        // Move the nth disk from fromRod to toRod
-        System.out.println("Move disk " + n + " from rod " + fromRod + " to rod " + toRod);
- 
-        // Move the n-1 disks from auxRod to toRod using fromRod
-        solveHanoi(n - 1, auxRod, toRod, fromRod);
-    }
- 
     public static void main(String[] args) {
-        int numberOfDisks = 3; // Number of disks
-        solveHanoi(numberOfDisks, 'A', 'C', 'B'); // A is the source rod, C is the destination rod, B is the auxiliary rod
+        int numDisks = 3; // number of disks
+        moveDisks(numDisks, "source", "auxiliary", "destination");
+    }
+
+    public static void moveDisks(int numDisks, String source, String auxiliary, String destination) {
+        if (numDisks == 1) {
+            System.out.println("Move disk 1 from " + source + " to " + destination);
+        } else {
+            moveDisks(numDisks - 1, source, destination, auxiliary);
+            System.out.println("Move disk " + numDisks + " from " + source + " to " + destination);
+            moveDisks(numDisks - 1, auxiliary, source, destination);
+        }
     }
 }
- 
+
+
+[11:25 AM] Maria (Unverified)
+
+
+Task 1: Tower of Hanoi Solver
+
+Create a program that solves the Tower of Hanoi puzzle for n disks.
+
+The solution should use recursion to move disks between three
+
+pegs (source, auxiliary, and destination) according to the game's rules.
+
+The program should print out each move required to solve the puzzle.
