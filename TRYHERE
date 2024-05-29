@@ -1,160 +1,88 @@
-[5:19 PM] Maria (Unverified)
+[12:13 PM] Maria (Unverified)
+package com.dynamicprogrammingalgorithms;
+// Knapsack0/1 problem
+public class Knapsack {
+	// Function to solve the 0/1 Knapsack problem
+    public static int knapsack(int[] weights, int[] values, int weightLimit) {
+        int n = weights.length;
+        int[][] dp = new int[n + 1][weightLimit + 1];
+ 
+        for (int i = 0; i <= n; i++) {
+            for (int w = 0; w <= weightLimit; w++) {
+                if (i == 0 || w == 0) {
+                    dp[i][w] = 0;
+                } else if (weights[i - 1] <= w) {
+                    dp[i][w] = Math.max(dp[i - 1][w], dp[i - 1][w - weights[i - 1]] + values[i - 1]);
+                } else {
+                    dp[i][w] = dp[i - 1][w];
+                }
+            }
+        }
+        return dp[n][weightLimit];
+    }
+ 
+    public static void main(String[] args) {
+        int[] weights = {2, 3, 4, 5};
+        int[] values = {3, 4, 5, 6};
+        int weightLimit = 5;
+        System.out.println("Maximum value in knapsack = " + knapsack(weights, values, weightLimit));
+    }
+}
+
+
+
+[12:14 PM] Maria (Unverified)
 package com.computationalalgorithms;
- 
 import java.util.Arrays;
+import java.util.Comparator;
  
-class Job {
-    char id;     // Job Id
-    int deadline; // Deadline of job
-    int profit;  // Profit if job is completed before or on deadline
-    
-    // Constructor
-    public Job(char id, int deadline, int profit) {
-        this.id = id;
-        this.deadline = deadline;
-        this.profit = profit;
+class Item {
+    int value, weight;
+ 
+    Item(int value, int weight) {
+        this.value = value;
+        this.weight = weight;
     }
 }
+public class FractionalKnapsack {
+	 private static double getMaxValue(Item[] items, int capacity) {
+	        // Sorting items by value-to-weight ratio
+	        Arrays.sort(items, new Comparator<Item>() {
+	            @Override
+	            public int compare(Item o1, Item o2) {
+	                double r1 = (double) o1.value / o1.weight;
+	                double r2 = (double) o2.value / o2.weight;
+	                return Double.compare(r2, r1);
+	            }
+	        });
  
-public class JobSequencing {
+	        double totalValue = 0.0;
+	        
+	        for (Item item : items) {
+	            if (capacity - item.weight >= 0) {
+	                // If the item can be added completely
+	                capacity -= item.weight;
+	                totalValue += item.value;
+	            } else {
+	                // If the item can be added fractionally
+	                totalValue += item.value * ((double) capacity / item.weight);
+	                break;
+	            }
+	        }
  
-    // Function to schedule the jobs to maximize profit
-    public static void scheduleJobs(Job[] jobs, int n) {
-        // Sort jobs in descending order of profit
-        Arrays.sort(jobs, (a, b) -> b.profit - a.profit);
-        
-        // To keep track of free time slots
-        boolean[] result = new boolean[n];
-        
-        // To store the sequence of jobs
-        char[] jobOrder = new char[n];
-        
-        // Initialize all slots to be free
-        for (int i = 0; i < n; i++) {
-            result[i] = false;
-        }
-        
-        // Iterate through all given jobs
-        for (int i = 0; i < jobs.length; i++) {
-            // Find a free slot for this job (starting from the last possible slot)
-            for (int j = Math.min(n, jobs[i].deadline) - 1; j >= 0; j--) {
-                // Free slot found
-                if (result[j] == false) {
-                    result[j] = true;
-                    jobOrder[j] = jobs[i].id;
-                    break;
-                }
-            }
-        }
-        
-        // Print the job order to maximize profit
-        System.out.println("Job sequence to maximize profit:");
-        for (int i = 0; i < n; i++) {
-            if (result[i]) {
-                System.out.print(jobOrder[i] + " ");
-            }
-        }
-        System.out.println();
-    }
+	        return totalValue;
+	    }
  
-    // Driver code
-    public static void main(String[] args) {
-        Job[] jobs = {
-            new Job('a', 2, 100),
-            new Job('b', 1, 19),
-            new Job('c', 2, 27),
-            new Job('d', 1, 25),
-            new Job('e', 3, 15)
-        };
-        int n = 3;  // Number of time slots
-        scheduleJobs(jobs, n);
-    }
+	    public static void main(String[] args) {
+	        Item[] items = {
+	            new Item(60, 10),
+	            new Item(100, 20),
+	            new Item(120, 30)
+	        };
+	        int capacity = 50;
+	        
+	        double maxValue = getMaxValue(items, capacity);
+	        System.out.println("Maximum value we can obtain = " + maxValue);
+	    }
 }
-
-
-[5:18 PM] Maria (Unverified)
-Task 3: Job Sequencing Problem
-
-Define a class Job with properties int Id, int Deadline, and int Profit.
-
-Then implement a function List<Job> JobSequencing(List<Job> jobs) that
-
-takes a list of jobs and returns the maximum profit sequence of jobs 
-
-that can be done before the deadlines. Use the greedy method to solve
-
-this problem.
-
-
-import java.util.*;
-
-class Job {
-    int id;
-    int deadline;
-    int profit;
-
-    public Job(int id, int deadline, int profit) {
-        this.id = id;
-        this.deadline = deadline;
-        this.profit = profit;
-    }
-}
-
-class JobSequencingSolution {
-    public List<Job> JobSequencing(List<Job> jobs) {
-        // Sort jobs based on profit in descending order
-        Collections.sort(jobs, (a, b) -> b.profit - a.profit);
-
-        // Find the maximum deadline among all jobs
-        int maxDeadline = 0;
-        for (Job job : jobs) {
-            if (job.deadline > maxDeadline) {
-                maxDeadline = job.deadline;
-            }
-        }
-
-        // Create a result array to store the result (sequence of jobs)
-        Job[] result = new Job[maxDeadline];
-        // Create a slot array to keep track of free time slots
-        boolean[] slot = new boolean[maxDeadline];
-
-        // Iterate through all given jobs
-        for (Job job : jobs) {
-            // Find a free slot for this job (we start from the last possible slot)
-            for (int j = job.deadline - 1; j >= 0; j--) {
-                if (!slot[j]) {
-                    // Add this job to result
-                    result[j] = job;
-                    slot[j] = true;
-                    break;
-                }
-            }
-        }
-
-        // Create a list to store the final job sequence
-        List<Job> jobSequence = new ArrayList<>();
-        for (Job job : result) {
-            if (job != null) {
-                jobSequence.add(job);
-            }
-        }
-
-        return jobSequence;
-    }
-
-    public static void main(String[] args) {
-        List<Job> jobs = new ArrayList<>();
-        jobs.add(new Job(1, 4, 20));
-        jobs.add(new Job(2, 1, 10));
-        jobs.add(new Job(3, 1, 40));
-        jobs.add(new Job(4, 1, 30));
-
-        JobSequencingSolution solution = new JobSequencingSolution();
-        List<Job> jobSequence = solution.JobSequencing(jobs);
-
-        System.out.println("The job sequence for maximum profit is:");
-        for (Job job : jobSequence) {
-            System.out.println("Job ID: " + job.id + ", Deadline: " + job.deadline + ", Profit: " + job.profit);
-        }
-    }
-}
+ 
